@@ -2,26 +2,20 @@ from DataStructures.Tree import bst_node as bst_node
 from DataStructures.List import array_list as al
 
 
-def new_map(cmp_function):
+def new_map():
     """Crea una tabla de simbolos ordenada basada en un árbol binario de búsqueda (BST) vacía
 
     Se crea una tabla de símbolos ordenada con los siguientes atributos:
 
     - **root**: Raíz del árbol. Inicializado en ``None``
     - **type**: Tipo de árbol. Inicializado en "BST"
-    - **cmp_function**: Función de comparación. Inicializado en ``None``
 
     :returns: La tabla de símbolos ordenada sin elementos
     :rtype: binary_search_tree
 
     """
     bst = {"root": None, "type": "BST", "cmp_function": None}
-
-    if cmp_function is None:
-        bst["cmp_function"] = default_compare
-    else:
-        bst["cmp_function"] = cmp_function
-
+    bst["cmp_function"] = default_compare
     return bst
 
 
@@ -510,7 +504,7 @@ def values_range(root, key_lo, key_hi, list_values, cmp_function):
         if cmp_lo < 0:
             values_range(root["left"], key_lo, key_hi, list_values, cmp_function)
         if cmp_lo <= 0 and cmp_hi >= 0:
-            al.add_last(list_values, root["key"])
+            al.add_last(list_values, root["value"])
         if cmp_hi > 0:
             values_range(root["right"], key_lo, key_hi, list_values, cmp_function)
     return list_values

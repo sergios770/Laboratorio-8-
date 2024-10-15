@@ -3,21 +3,13 @@ from DataStructures.Tree import bst_node as bst_node
 from DataStructures.Utils.utils import handle_not_implemented
 
 
-def default_compare_test(a, b):
-    if a > bst_node.get_key(b):
-        return 1
-    elif a < bst_node.get_key(b):
-        return -1
-    return 0
-
-
 def setup_tests():
-    empty_tree = bst.new_map(default_compare_test)
+    empty_tree = bst.new_map()
 
     return empty_tree
 
 def setup_one_node():
-    one_node = bst.new_map(default_compare_test)
+    one_node = bst.new_map()
     node = bst_node.new_node(1,1)
     
     one_node["root"] = node
@@ -25,10 +17,10 @@ def setup_one_node():
     return one_node
 
 def setup_three_nodes():
-    three_nodes = bst.new_map(default_compare_test)
-    node_1 = bst_node.new_node(1, 1)
-    node_3 = bst_node.new_node(10, 10)
-    node_2 = bst_node.new_node(5, 5)
+    three_nodes = bst.new_map()
+    node_1 = bst_node.new_node(1, 10)
+    node_3 = bst_node.new_node(10, 100)
+    node_2 = bst_node.new_node(5, 50)
 
     node_2["left"] = node_1
     node_2["right"] = node_3
@@ -40,14 +32,14 @@ def setup_three_nodes():
 
 
 def setup_seven_nodes():
-    seven_nodes = bst.new_map(default_compare_test)
-    node_1 = bst_node.new_node(10, 10)
-    node_2 = bst_node.new_node(20, 20)
-    node_3 = bst_node.new_node(30, 30)
-    node_4 = bst_node.new_node(40, 40)
-    node_5 = bst_node.new_node(50, 50)
-    node_6 = bst_node.new_node(60, 60)
-    node_7 = bst_node.new_node(70, 70)
+    seven_nodes = bst.new_map()
+    node_1 = bst_node.new_node(10, 100)
+    node_2 = bst_node.new_node(20, 200)
+    node_3 = bst_node.new_node(30, 300)
+    node_4 = bst_node.new_node(40, 400)
+    node_5 = bst_node.new_node(50, 500)
+    node_6 = bst_node.new_node(60, 600)
+    node_7 = bst_node.new_node(70, 700)
 
     node_2["left"] = node_1
     node_2["right"] = node_3
@@ -66,7 +58,7 @@ def setup_seven_nodes():
     return seven_nodes
 
 def setup_unbalanced():
-    unbalanced = bst.new_map(default_compare_test)
+    unbalanced = bst.new_map()
     bst.put(unbalanced, 40, 40)
     bst.put(unbalanced, 20, 20)
     bst.put(unbalanced, 10, 10)
@@ -81,7 +73,7 @@ def setup_unbalanced():
 
 @handle_not_implemented
 def test_new_binary_search_tree():
-    empty_bst = bst.new_map(default_compare_test)
+    empty_bst = bst.new_map()
 
     print(empty_bst)
 
@@ -164,9 +156,9 @@ def test_get():
     assert bst.get(empty_bst, 1) is None
 
     # Obtener un valor de un árbol con 3 nodos
-    assert bst.get(three_bst, 1) == 1
-    assert bst.get(three_bst, 5) == 5
-    assert bst.get(three_bst, 10) == 10
+    assert bst.get(three_bst, 1) == 10
+    assert bst.get(three_bst, 5) == 50
+    assert bst.get(three_bst, 10) == 100
 
     # Obtener un valor que no existe en un árbol con 3 nodos
     assert bst.get(three_bst, 0) is None
@@ -190,7 +182,7 @@ def test_remove():
     assert three_bst["root"]["size"] == 2
     assert three_bst["root"]["left"] is None
     assert three_bst["root"]["right"]["key"] == 10
-    assert three_bst["root"]["right"]["value"] == 10
+    assert three_bst["root"]["right"]["value"] == 100
     assert three_bst["root"]["right"]["size"] == 1
 
     # Eliminar un valor que no existe en un árbol con 3 nodos
@@ -306,9 +298,9 @@ def test_value_set():
     value_set = bst.value_set(three_bst)
 
     assert value_set["size"] == 3
-    assert value_set["elements"][0] == 1
-    assert value_set["elements"][1] == 5
-    assert value_set["elements"][2] == 10
+    assert value_set["elements"][0] == 10
+    assert value_set["elements"][1] == 50
+    assert value_set["elements"][2] == 100
 
 
 @handle_not_implemented
@@ -360,7 +352,7 @@ def test_delete_min():
     assert three_bst["root"]["size"] == 2
     assert three_bst["root"]["left"] is None
     assert three_bst["root"]["right"]["key"] == 10
-    assert three_bst["root"]["right"]["value"] == 10
+    assert three_bst["root"]["right"]["value"] == 100
     assert three_bst["root"]["right"]["size"] == 1
 
     # Eliminar la llave mínima de un árbol con 7 nodos
@@ -387,7 +379,7 @@ def test_delete_max():
 
     assert three_bst["root"]["size"] == 2
     assert three_bst["root"]["left"]["key"] == 1
-    assert three_bst["root"]["left"]["value"] == 1
+    assert three_bst["root"]["left"]["value"] == 10
     assert three_bst["root"]["left"]["size"] == 1
     assert three_bst["root"]["right"] is None
 
@@ -578,18 +570,18 @@ def test_values():
     values = bst.values(three_bst, 1, 10)
 
     assert values["size"] == 3
-    assert values["elements"][0] == 1
-    assert values["elements"][1] == 5
-    assert values["elements"][2] == 10
+    assert values["elements"][0] == 10
+    assert values["elements"][1] == 50
+    assert values["elements"][2] == 100
 
     # Valores de un árbol con 7 nodos
     values = bst.values(seven_bst, 1, 100)
 
     assert values["size"] == 7
-    assert values["elements"][0] == 10
-    assert values["elements"][1] == 20
-    assert values["elements"][2] == 30
-    assert values["elements"][3] == 40
-    assert values["elements"][4] == 50
-    assert values["elements"][5] == 60
-    assert values["elements"][6] == 70
+    assert values["elements"][0] == 100
+    assert values["elements"][1] == 200
+    assert values["elements"][2] == 300
+    assert values["elements"][3] == 400
+    assert values["elements"][4] == 500
+    assert values["elements"][5] == 600
+    assert values["elements"][6] == 700

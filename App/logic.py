@@ -26,10 +26,14 @@
 
 import os
 import csv
+import datetime
 
-# TODO Realice la importación del mapa linear probing
-# TODO Realice la importación de ArrayList como estructura de datos auxiliar para sus requerimientos
-
+# TODO Realice la importación del Árbol Binario Ordenado
+from DataStructures.Tree import binary_search_tree as bst
+# TODO Realice la importación de ArrayList (al) como estructura de datos auxiliar para sus requerimientos
+from DataStructures.List import array_list as al
+# TODO Realice la importación de LinearProbing (lp) como estructura de datos auxiliar para sus requerimientos
+from DataStructures.Map import map_linear_probing as lp
 
 
 data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/'
@@ -37,266 +41,188 @@ data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/'
 
 
 def new_logic():
+    """ Inicializa el analizador
+
+    Crea una lista vacia para guardar todos los crimenes
+    Se crean indices (Maps) por los siguientes criterios:
+    -Fechas
+
+    Retorna el analizador inicializado.
     """
-    Inicializa el catálogo de libros. Crea una lista vacía para guardar
-    los libros y utiliza tablas de hash para almacenar los datos restantes con diferentes índices
-    utilizando linear probing como tipo de tabla de hash
-    """
-    catalog = {"books": None,
-               "books_by_id": None,
-               "books_by_year_author":None,
-               "books_by_authors": None,
-               "tags": None,
-               "book_tags": None}
+    analyzer = {'crimes': None,
+                'dateIndex': None
+                }
 
-    #Lista que contiene la totalidad de los libros cargados
-    catalog['books'] = al.new_list()
-
-    #Tabla de Hash que contiene los libros indexados por good_reads_book_id  
-    #(good_read_id -> book)
-    catalog['books_by_id'] = #TODO completar la creación del mapa
-
-    #Tabla de Hash con la siguiente pareja llave valor: (author_name -> List(books))
-    catalog['books_by_authors'] = #TODO completar la creación del mapa
-
-    #Tabla de Hash con la siguiente pareja llave valor: (tag_name -> tag)
-    catalog['tags'] = #TODO completar la creación del mapa
-
-    #Tabla de Hash con la siguiente pareja llave valor: (tag_id -> book_tags)
-    catalog['book_tags'] = lp.new_map(1000,0.7)
-
-    #Tabla de Hash principal que contiene sub-mapas dentro de los valores
-    #con la siguiente representación de la pareja llave valor: (author_name -> (original_publication_year -> list(books)))
-    catalog['books_by_year_author'] = #TODO completar la creación del mapa
+    analyzer['crimes'] = al.new_list()
+    # TODO completar la creación del mapa ordenado
+    analyzer['dateIndex'] = bst.new_map()
     
-    return catalog
+    return analyzer
 
-#  -------------------------------------------------------------
-# Funciones para la carga de datos
-#  -------------------------------------------------------------
+# Funciones para realizar la carga
 
-def load_data(catalog):
+def load_data(analyzer, crimesfile):
     """
-    Carga los datos de los archivos y cargar los datos en la
-    estructura de datos
+    Carga los datos de los archivos CSV en el modelo
     """
-    books, authors = load_books(catalog)
-    tag_size = load_tags(catalog)
-    book_tag_size = load_books_tags(catalog)
-    return books, authors,tag_size,book_tag_size
-
-
-def load_books(catalog):
-    """
-    Carga los libros del archivo.  Por cada libro se toman sus autores y por
-    cada uno de ellos, se crea en la lista de autores, a dicho autor y una
-    referencia al libro que se esta procesando.
-    """
-    booksfile = data_dir + "books-small.csv"
-    input_file = csv.DictReader(open(booksfile, encoding='utf-8'))
-    for book in input_file:
-        add_book(catalog, book)
-    return book_size(catalog), author_size(catalog)
+    crimesfile = data_dir + crimesfile
+    input_file = csv.DictReader(open(crimesfile, encoding="utf-8"),
+                                delimiter=",")
+    for crime in input_file:
+        add_crime(analyzer, crime)
+    return analyzer
 
 
-def load_tags(catalog):
-    """
-    Carga todos los tags del archivo y los agrega a la lista de tags
-    """
-    tagsfile = data_dir + 'tags.csv'
-    input_file = csv.DictReader(open(tagsfile, encoding='utf-8'))
-    for tag in input_file:
-        add_tag(catalog, tag)
-    return tag_size(catalog)
+
+# Funciones para agregar informacion al analizador
 
 
-def load_books_tags(catalog):
+def add_crime(analyzer, crime):
     """
-    Carga la información que asocia tags con libros.
+    funcion que agrega un crimen al catalogo
     """
-    bookstagsfile = data_dir +"book_tags-small.csv"
-    input_file = csv.DictReader(open(bookstagsfile, encoding='utf-8'))
-    for booktag in input_file:
-        add_book_tag(catalog, booktag)
-    return book_tag_size(catalog)
+    al.add_last(analyzer['crimes'], crime)
+    update_date_index(analyzer['dateIndex'], crime)
+    return analyzer
 
 
-def new_tag(name, id):
+def update_date_index(map, crime):
     """
-    Esta estructura almancena los tags utilizados para marcar libros.
-    """
-    tag = {"name": "", "tag_id": ""}
-    tag['name'] = name
-    tag['tag_id'] = id
-    return tag
+    Se toma la fecha del crimen y se busca si ya existe en el arbol
+    dicha fecha.  Si es asi, se adiciona a su lista de crimenes
+    y se actualiza el indice de tipos de crimenes.
 
-
-def new_book_tag(tag_id, book_id, count):
+    Si no se encuentra creado un nodo para esa fecha en el arbol
+    se crea y se actualiza el indice de tipos de crimenes
     """
-    Esta estructura crea una relación entre un tag y
-    los libros que han sido marcados con dicho tag.
-    """
-    book_tag = {'tag_id': tag_id, 'book_id': book_id,'count':count}
-    return book_tag
-
-#  -----------------------------------------------   
-#  Funciones para agregar informacion al catalogo
-#  -----------------------------------------------
-
-def add_book(catalog, book):
-    """
-    Adiciona un libro al mapa de libros.
-    Además, guarda la información de los autores en las tablas de hash correspondientes
-    """
-    # Se adiciona el libro a la lista general de libros
-    al.add_last(catalog['books'], book)
-    # Se adiciona el libro a la tabla de hash indexada por goodreads_book_id
-    lp.put(catalog['books_by_id'],book['goodreads_book_id'], book)
-    # Se obtienen los autores del libro
-    authors = book['authors'].split(",")
-    # Para cada autor, se agrega en la tabla de hash indexada por autores y 
-    # en las tablas de hash indexadas por autor y por año de publicación
-    for author in authors:
-        add_book_author(catalog, author.strip(), book)
-        add_book_author_and_year(catalog,author.strip(), book)
-    return catalog
-
-
-def add_book_author(catalog, author_name, book):
-    """
-    Adiciona un autor al mapa de autores, la cual guarda referencias
-    a los libros de dicho autor
-    """
-    authors = catalog['books_by_authors']
-    author_value = lp.get(authors,author_name)
-    if author_value:
-        #Si el autor ya se había agregado al mapa, se obtiene la lista que contiene sus libros y se agrega el nuevo elemento.
-        al.add_last(author_value,book)
+    occurreddate = crime['OCCURRED_ON_DATE']
+    crimedate = datetime.datetime.strptime(occurreddate, '%Y-%m-%d %H:%M:%S')
+    entry = bst.get(map, crimedate.date())
+    if entry is None:
+        # TODO Realizar el caso en el que no se encuentra la fecha
+        datentry = new_data_entry(crime)
+        bst.put(map, crimedate.date(), datentry)
     else:
-        #Si es un autor nuevo, se agrega al mapa teniendo como llave el nombre del autor 
-        # y como valor una lista que contiene los libros asociados al autor.
-        authors_books = al.new_list()
-        al.add_last(authors_books,book)
-        lp.put(authors,author_name,authors_books)
-    return catalog
+        datentry = entry
+    add_date_index(datentry, crime)
+    return map
 
 
-def add_book_author_and_year(catalog, author_name, book):
+def add_date_index(datentry, crime):
     """
-    Adiciona un autor a los mapas indexados por autor y por año de publicación.
-    Si el autor ya se había agregado: 
-        - Si el año de publicación también se había agregado, se obtiene la lista en el tercer nivel y se agrega el libro.
-        - Si el año de publicación no se había agregado, se agrega un nuevo mapa dentro del indice del autor y dentro de 
-        este mapa se agrega una lista con el libro asociado.
-    Si el autor no se había agregado:
-        - Se crea el indice del nuevo autor, se crea dentro del valor el mapa asociado al nuevo año de publicación y 
-        en el tercer nivel se agrega una lista como valor de este ultimo mapa con el libro asociado
+    Actualiza un indice de tipo de crimenes.  Este indice tiene una lista
+    de crimenes y una tabla de hash cuya llave es el tipo de crimen y
+    el valor es una lista con los crimenes de dicho tipo en la fecha que
+    se está consultando (dada por el nodo del arbol)
     """
-    books_by_year_author = catalog['books_by_year_author']
-    pub_year = book['original_publication_year']
-    #Si el año de publicación está vacío se reemplaza por un valor simbolico
-    #TODO Completar manejo de los escenarios donde el año de publicación es vacío.
-    author_value = lp.get(books_by_year_author,author_name)
-    if author_value:
-        pub_year_value = lp.get(author_value,pub_year)
-        if pub_year_value:
-            al.add_last(pub_year_value,book)
-        else:
-            books = al.new_list()
-            al.add_last(books, book)
-            pub_year_map = lp.new_map(1000,0.7)
-            lp.put(pub_year_map,pub_year,book)
+    lst = datentry['lstcrimes']
+    al.add_last(lst, crime)
+    offenseIndex = datentry['offenseIndex']
+    offentry = lp.get(offenseIndex, crime['OFFENSE_CODE_GROUP'])
+    if (offentry is None):
+        # TODO Realice el caso en el que no se encuentre el tipo de crimen
+        entry = new_offense_entry(crime['OFFENSE_CODE_GROUP'], crime)
+        al.add_last(entry['lstoffenses'], crime)
+        lp.put(offenseIndex, crime['OFFENSE_CODE_GROUP'], entry)
     else:
-        # TODO Completar escenario donde no se había agregado el autor al mapa principal
-    return catalog
+        # TODO Realice el caso en el que se encuentre el tipo de crimen
+        entry = offentry
+        al.add_last(entry['lstoffenses'], crime)
+    return datentry
 
 
-def add_tag(catalog, tag):
+def new_data_entry(crime):
     """
-    Adiciona un tag al mapa de tags indexado por nombre del tag
+    Crea una entrada en el indice por fechas, es decir en el arbol
+    binario.
     """
-    t = new_tag(tag['tag_name'], tag['tag_id'])
-    lp.put(catalog['tags'],tag['tag_name'],t)
-    return catalog
+    entry = {'offenseIndex': None, 'lstcrimes': None}
+    entry['offenseIndex'] = lp.new_map(num_elements=30,
+                                        load_factor=0.5)
+    entry['lstcrimes'] = al.new_list()
+    return entry
 
 
-def add_book_tag(catalog, book_tag):
+def new_offense_entry(offensegrp, crime):
     """
-    Adiciona un tag a la lista de tags.
-    Si el book_tag ya había sido agregado:
-        - Se obtiene la lista asociada al valor del indice y se agrega el book_yag
-    Si el book_tag no había sido agregado:
-        - Se crea el nuevo indice en el mapa y como valor se agrega una nueva lista con el book_tag asociado.
+    Crea una entrada en el indice por tipo de crimen, es decir en
+    la tabla de hash, que se encuentra en cada nodo del arbol.
     """
-    t = new_book_tag(book_tag['tag_id'], book_tag['goodreads_book_id'], book_tag['count'])
-    book_tag_value = lp.contains(catalog['book_tags'],t['tag_id'])
-    if book_tag_value:
-        book_tag_list = lp.get(catalog['book_tags'],t['tag_id'])
-        al.add_last(book_tag_list,book_tag)
-    else:
-        #TODO Completar escenario donde el book_tag no se había agregado al mapa   
-    return catalog
+    ofentry = {'offense': None, 'lstoffenses': None}
+    ofentry['offense'] = offensegrp
+    ofentry['lstoffenses'] = al.new_list()
+    return ofentry
 
-#  -------------------------------------------------------------
+
+# ==============================
 # Funciones de consulta
-#  -------------------------------------------------------------
+# ==============================
 
-def get_book_info_by_book_id(catalog, good_reads_book_id):
+
+def crimes_size(analyzer):
     """
-    Retorna toda la informacion que se tenga almacenada de un libro según su good_reads_id.
+    Número de crimenes
     """
-    #TODO Completar función de consulta
-    pass
+    return al.size(analyzer['crimes'])
 
 
-def get_books_by_author(catalog, author_name):
+def index_height(analyzer):
     """
-    Retorna los libros asociado al autor ingresado por párametro
+    Altura del arbol
     """
-    #TODO Completar función de consulta
-    pass
+    # TODO Completar la función de consulta
+    return bst.height(analyzer['dateIndex'])
 
 
-def get_books_by_tag(catalog, tag_name):
+def index_size(analyzer):
     """
-    Retorna el número de libros que fueron etiquetados con el tag_name especificado.
-    - Se obtiene el tag asociado al tag_name dado.
-    - Teniendo la información del tag, se obtiene el tag_id para relacionarlo con la estructura que contiene el 
-    set de datos de book_tags y obtener más información.
-    - Teniendo el tag_id, se puede obtener el goodreads_book_id de la estructura que contiene los datos 
-    de book_tags y finalmente relacionarlo con los datos completos del libro.
-
+    Numero de elementos en el indice
     """
-    #TODO Completar función de consulta
-    pass
+    # TODO Completar la función de consulta
+    return bst.size(analyzer['dateIndex'])
 
 
-def get_books_by_author_pub_year(catalog, author_name, pub_year):
+def min_key(analyzer):
     """
-    - Se obtiene el mapa asociado al author_name dado
-    - Si el author existe, se obtiene el mapa asociado al año de publicación
-    Retorna los libros asociados a un autor y un año de publicación especificos
+    Llave mas pequena
     """
-    #TODO Completar función de consulta
-    pass
+    # TODO Completar la función de consulta
+    return bst.min_key(analyzer['dateIndex'])
 
 
-#  -------------------------------------------------------------
-# Funciones utilizadas para obtener el tamaño de los mapas
-#  -------------------------------------------------------------
-
-def book_size(catalog):
-    return lp.size(catalog['books_by_id'])
-
-
-def author_size(catalog):
-    return lp.size(catalog['books_by_authors'])
+def max_key(analyzer):
+    """
+    Llave mas grande
+    """
+    # TODO Completar la función de consulta
+    return bst.max_key(analyzer['dateIndex'])
 
 
-def tag_size(catalog):
-    return lp.size(catalog['tags'])
+def get_crimes_by_range(analyzer, initialDate, finalDate):
+    """
+    Retorna el numero de crimenes en un rago de fechas.
+    """
+    # TODO Completar la función de consulta
+    initialDate = datetime.datetime.strptime(initialDate, '%Y-%m-%d')
+    finalDate = datetime.datetime.strptime(finalDate, '%Y-%m-%d')
+    lst = bst.values(analyzer['dateIndex'], initialDate.date(), finalDate.date())
+    totcrimes = 0
+    for lstdate in lst["elements"]:
+        totcrimes += al.size(lstdate['lstcrimes'])
+    return totcrimes
 
 
-def book_tag_size(catalog):
-    return lp.size(catalog['book_tags'])
-
+def get_crimes_by_range_code(analyzer, initialDate, offensecode):
+    """
+    Para una fecha determinada, retorna el numero de crimenes
+    de un tipo especifico.
+    """
+    # TODO Completar la función de consulta
+    initialDate = datetime.datetime.strptime(initialDate, '%Y-%m-%d')
+    crimedate = bst.get(analyzer['dateIndex'], initialDate.date())
+    if crimedate is not None:
+        offensemap = crimedate['offenseIndex']
+        numoffenses = lp.get(offensemap, offensecode)
+        if numoffenses is not None:
+            return lp.size(numoffenses['lstoffenses'])
+    return 0
