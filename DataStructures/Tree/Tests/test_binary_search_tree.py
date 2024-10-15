@@ -506,7 +506,7 @@ def test_height():
 
 
     # Altura de un árbol vacío
-    assert bst.height(empty_bst) == 0
+    assert bst.height(empty_bst) == -1
     
     # Altura de un árbol con 1 nodo
     assert bst.height(one_bst) == 0

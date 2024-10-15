@@ -14,8 +14,7 @@ def new_map():
     :rtype: binary_search_tree
 
     """
-    bst = {"root": None, "type": "BST", "cmp_function": None}
-    bst["cmp_function"] = default_compare
+    bst = {"root": None, "type": "BST"}
     return bst
 
 
@@ -32,7 +31,7 @@ def put(my_bst, key, value):
     :returns: El arbol con la nueva pareja
     :rtype: binary_search_tree
     """
-    my_bst["root"] = insert_node(my_bst["root"], key, value, my_bst["cmp_function"])
+    my_bst["root"] = insert_node(my_bst["root"], key, value)
     return my_bst
 
 
@@ -47,7 +46,7 @@ def get(my_bst, key):
     Raises:
         Exception
     """
-    return get_node(my_bst["root"], key, my_bst["cmp_function"])
+    return get_node(my_bst["root"], key)
 
 
 def remove(my_bst, key):
@@ -61,7 +60,7 @@ def remove(my_bst, key):
     Raises:
         Exception
     """
-    my_bst["root"] = remove_node(my_bst["root"], key, my_bst["cmp_function"])
+    my_bst["root"] = remove_node(my_bst["root"], key)
     return my_bst
 
 
@@ -207,7 +206,7 @@ def floor(my_bst, key):
     Raises:
         Exception
     """
-    node = floor_key(my_bst["root"], key, my_bst["cmp_function"])
+    node = floor_key(my_bst["root"], key)
     if node is not None:
         return bst_node.get_key(node)
     return node
@@ -225,7 +224,7 @@ def ceiling(my_bst, key):
     Raises:
         Exception
     """
-    node = ceiling_key(my_bst["root"], key, my_bst["cmp_function"])
+    node = ceiling_key(my_bst["root"], key)
     if node is not None:
         return bst_node.get_key(node)
     return node
@@ -259,7 +258,7 @@ def rank(my_bst, key):
     Raises:
         Exception
     """
-    return rank_keys(my_bst["root"], key, my_bst["cmp_function"])
+    return rank_keys(my_bst["root"], key)
 
 
 def height(my_bst):
@@ -291,7 +290,7 @@ def keys(my_bst, key_lo, key_hi):
     """
     list_key = al.new_list()
     list_key = keys_range(
-        my_bst["root"], key_lo, key_hi, list_key, my_bst["cmp_function"]
+        my_bst["root"], key_lo, key_hi, list_key
     )
     return list_key
 
@@ -312,7 +311,7 @@ def values(my_bst, key_lo, key_hi):
     """
     list_values = al.new_list()
     list_values = values_range(
-        my_bst["root"], key_lo, key_hi, list_values, my_bst["cmp_function"]
+        my_bst["root"], key_lo, key_hi, list_values
     )
     return list_values
 
@@ -321,41 +320,41 @@ def values(my_bst, key_lo, key_hi):
 #            Funciones Helper
 # _____________________________________________________________________
 
-def insert_node(root, key, value, cmp_function):
+def insert_node(root, key, value):
     
     if root is None:
         root = bst_node.new_node(key, value)
     else:
-        cmp = cmp_function(key, root)
+        cmp = default_compare(key, root)
         if cmp == 0:
             root["value"] = value
         elif cmp < 0:
-            root["left"] = insert_node(root["left"], key, value, cmp_function)
+            root["left"] = insert_node(root["left"], key, value)
         else:
-            root["right"] = insert_node(root["right"], key, value, cmp_function)
+            root["right"] = insert_node(root["right"], key, value)
     
     root["size"] = 1 + size_tree(root["left"]) + size_tree(root["right"])
     return root
 
-def get_node(root, key, cmp_function):    
+def get_node(root, key):    
     if root is not None:
-        cmp = cmp_function(key, root)
+        cmp = default_compare(key, root)
         if cmp == 0:
             return root["value"]
         elif cmp < 0:
-            return get_node(root["left"], key, cmp_function)
-        return get_node(root["right"], key, cmp_function)
+            return get_node(root["left"], key)
+        return get_node(root["right"], key)
     return None
 
 
 
-def remove_node(root, key, cmp_function):
+def remove_node(root, key):
     if root is not None:
-        cmp = cmp_function(key, root)
+        cmp = default_compare(key, root)
         if cmp < 0:
-            root["left"] = remove_node(root["left"], key, cmp_function)
+            root["left"] = remove_node(root["left"], key)
         elif cmp > 0:
-            root["right"] = remove_node(root["right"], key, cmp_function)
+            root["right"] = remove_node(root["right"], key)
         else:
             if root["right"] is None:
                 return root["left"]
@@ -431,26 +430,26 @@ def delete_max_tree(root):
     return None
 
 
-def floor_key(root, key, cmp_function):
+def floor_key(root, key):
     if root is not None:
-        cmp = cmp_function(key, root)
+        cmp = default_compare(key, root)
         if cmp == 0:
             return root
         elif cmp < 0:
-            return floor_key(root["left"], key, cmp_function)
-        k = floor_key(root["right"], key, cmp_function)
+            return floor_key(root["left"], key)
+        k = floor_key(root["right"], key)
         return k if k else root
     return None
 
 
-def ceiling_key(root, key, cmp_function):
+def ceiling_key(root, key):
     if root is not None:
-        cmp = cmp_function(key, root)
+        cmp = default_compare(key, root)
         if cmp == 0:
             return root
         elif cmp > 0:
-            return ceiling_key(root["right"], key, cmp_function)
-        k = ceiling_key(root["left"], key, cmp_function)
+            return ceiling_key(root["right"], key)
+        k = ceiling_key(root["left"], key)
         return k if k else root
     return None
 
@@ -467,46 +466,47 @@ def select_key(root, key):
     return None
 
 
-def rank_keys(root, key, cmp_function):
+def rank_keys(root, key):
     if root is not None:
-        cmp = cmp_function(key, root)
+        cmp = default_compare(key, root)
         pos = size_tree(root["left"])
         if cmp == 0:
             return pos
         elif cmp < 0:
-            return rank_keys(root["left"], key, cmp_function)
-        return rank_keys(root["right"], key, cmp_function) + pos + 1
+            return rank_keys(root["left"], key)
+        return rank_keys(root["right"], key) + pos + 1
     return 0
 
 def height_tree(root):
-    if (root is not None) and (root["left"] or root["right"]):
+    if root is None:
+        return -1
+    else:
         return 1 + max(height_tree(root["right"]), height_tree(root["left"]))
-    return 0
 
 
-def keys_range(root, key_lo, key_hi, list_key, cmp_function):
+def keys_range(root, key_lo, key_hi, list_key):
     if root is not None:
-        cmp_lo = cmp_function(key_lo, root)
-        cmp_hi = cmp_function(key_hi, root)
+        cmp_lo = default_compare(key_lo, root)
+        cmp_hi = default_compare(key_hi, root)
         if cmp_lo < 0:
-            keys_range(root["left"], key_lo, key_hi, list_key, cmp_function)
+            keys_range(root["left"], key_lo, key_hi, list_key)
         if cmp_lo <= 0 and cmp_hi >= 0:
             al.add_last(list_key, root["key"])
         if cmp_hi > 0:
-            keys_range(root["right"], key_lo, key_hi, list_key, cmp_function)
+            keys_range(root["right"], key_lo, key_hi, list_key)
     return list_key
 
 
-def values_range(root, key_lo, key_hi, list_values, cmp_function):
+def values_range(root, key_lo, key_hi, list_values):
     if root is not None:
-        cmp_lo = cmp_function(key_lo, root)
-        cmp_hi = cmp_function(key_hi, root)
+        cmp_lo = default_compare(key_lo, root)
+        cmp_hi = default_compare(key_hi, root)
         if cmp_lo < 0:
-            values_range(root["left"], key_lo, key_hi, list_values, cmp_function)
+            values_range(root["left"], key_lo, key_hi, list_values)
         if cmp_lo <= 0 and cmp_hi >= 0:
             al.add_last(list_values, root["value"])
         if cmp_hi > 0:
-            values_range(root["right"], key_lo, key_hi, list_values, cmp_function)
+            values_range(root["right"], key_lo, key_hi, list_values)
     return list_values
 
 
