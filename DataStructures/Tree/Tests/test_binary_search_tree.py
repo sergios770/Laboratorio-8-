@@ -1,6 +1,6 @@
 from DataStructures.Tree import binary_search_tree as bst
 from DataStructures.Tree import bst_node as bst_node
-from DataStructures.Utils.utils import handle_not_implemented
+import pytest
 
 
 def setup_tests():
@@ -71,7 +71,7 @@ def setup_unbalanced():
     
     return unbalanced
 
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_new_binary_search_tree():
     empty_bst = bst.new_map()
 
@@ -81,7 +81,7 @@ def test_new_binary_search_tree():
     assert empty_bst["type"] == "BST"
 
 
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_put():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
@@ -147,25 +147,25 @@ def test_put():
     assert three_bst["root"]["left"]["size"] == 3
 
 
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_get():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
 
     # Obtener un valor de un árbol vacío
     assert bst.get(empty_bst, 1) is None
-
+    
     # Obtener un valor de un árbol con 3 nodos
     assert bst.get(three_bst, 1) == 10
     assert bst.get(three_bst, 5) == 50
     assert bst.get(three_bst, 10) == 100
-
+    
     # Obtener un valor que no existe en un árbol con 3 nodos
     assert bst.get(three_bst, 0) is None
     assert bst.get(three_bst, 15) is None
 
 
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_remove():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
@@ -175,22 +175,25 @@ def test_remove():
     bst.remove(empty_bst, 1)
 
     assert empty_bst["root"] is None
-
+    print ('test 1 passed')
+    
     # Eliminar un valor de un árbol con 3 nodos
     bst.remove(three_bst, 1)
-
+    
     assert three_bst["root"]["size"] == 2
     assert three_bst["root"]["left"] is None
     assert three_bst["root"]["right"]["key"] == 10
     assert three_bst["root"]["right"]["value"] == 100
     assert three_bst["root"]["right"]["size"] == 1
-
+    print ('test 2 passed')
+    
     # Eliminar un valor que no existe en un árbol con 3 nodos
     bst.remove(three_bst, 0)
 
     assert three_bst["root"]["size"] == 2
     assert three_bst["root"]["left"] is None
     assert three_bst["root"]["right"] is not None
+    print ('test 3 passed')
 
     # Eliminar un valor que no existe en un árbol con 7 nodos
     bst.remove(seven_bst, 0)
@@ -198,6 +201,7 @@ def test_remove():
     assert seven_bst["root"]["size"] == 7
     assert seven_bst["root"]["left"] is not None
     assert seven_bst["root"]["right"] is not None
+    print ('test 4 passed')
 
     # Eliminar una hoja de un árbol con 7 nodos
     bst.remove(seven_bst, 10)
@@ -205,19 +209,20 @@ def test_remove():
     assert seven_bst["root"]["size"] == 6
     assert seven_bst["root"]["left"]["left"] is None
     assert seven_bst["root"]["left"]["right"] is not None
+    print ('test 5 passed')
 
     # Eliminar un nodo con un hijo de un árbol con 7 nodos
     bst.remove(seven_bst, 60)
-
+    print ('\n', seven_bst)
     assert seven_bst["root"]["size"] == 5
     assert seven_bst["root"]["right"]["right"] is None
     assert seven_bst["root"]["right"]["left"] is not None
     assert seven_bst["root"]["right"]["key"] == 70
     assert seven_bst["root"]["right"]["size"] == 2
     assert seven_bst["root"]["right"]["left"]["key"] == 50
+    print ('test 6 passed')
 
-
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_contains():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
@@ -235,7 +240,7 @@ def test_contains():
     assert not bst.contains(three_bst, 15)
 
 
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_size():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
@@ -251,7 +256,7 @@ def test_size():
     assert bst.size(seven_bst) == 7
 
 
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_is_empty():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
@@ -263,7 +268,7 @@ def test_is_empty():
     assert not bst.is_empty(three_bst)
 
 
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_key_set():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
@@ -283,7 +288,7 @@ def test_key_set():
     assert key_set["elements"][2] == 10
 
 
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_value_set():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
@@ -303,51 +308,51 @@ def test_value_set():
     assert value_set["elements"][2] == 100
 
 
-@handle_not_implemented
-def test_min_key():
+#@pytest.mark.skip(reason="No implementado aun")
+def test_left_key():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
     seven_bst = setup_seven_nodes()
 
     # Verificar la llave mínima de un árbol vacío
-    assert bst.min_key(empty_bst) is None
+    assert bst.left_key(empty_bst) is None
 
     # Verificar la llave mínima de un árbol con 3 nodos
-    assert bst.min_key(three_bst) == 1
+    assert bst.left_key(three_bst) == 1
 
     # Verificar la llave mínima de un árbol con 7 nodos
-    assert bst.min_key(seven_bst) == 10
+    assert bst.left_key(seven_bst) == 10
 
 
-@handle_not_implemented
-def test_max_key():
+#@pytest.mark.skip(reason="No implementado aun")
+def test_right_key():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
     seven_bst = setup_seven_nodes()
 
     # Verificar la llave máxima de un árbol vacío
-    assert bst.max_key(empty_bst) is None
+    assert bst.right_key(empty_bst) is None
 
     # Verificar la llave máxima de un árbol con 3 nodos
-    assert bst.max_key(three_bst) == 10
+    assert bst.right_key(three_bst) == 10
 
     # Verificar la llave máxima de un árbol con 7 nodos
-    assert bst.max_key(seven_bst) == 70
+    assert bst.right_key(seven_bst) == 70
 
 
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_delete_min():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
     seven_bst = setup_seven_nodes()
 
     # Eliminar la llave mínima de un árbol vacío
-    bst.delete_min(empty_bst)
+    bst.delete_left(empty_bst)
 
     assert empty_bst["root"] is None
 
     # Eliminar la llave mínima de un árbol con 3 nodos
-    bst.delete_min(three_bst)
+    bst.delete_left(three_bst)
 
     assert three_bst["root"]["size"] == 2
     assert three_bst["root"]["left"] is None
@@ -356,26 +361,26 @@ def test_delete_min():
     assert three_bst["root"]["right"]["size"] == 1
 
     # Eliminar la llave mínima de un árbol con 7 nodos
-    bst.delete_min(seven_bst)
+    bst.delete_left(seven_bst)
 
     assert seven_bst["root"]["size"] == 6
     assert seven_bst["root"]["left"]["left"] is None
     assert seven_bst["root"]["left"]["right"] is not None
 
 
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_delete_max():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
     seven_bst = setup_seven_nodes()
 
     # Eliminar la llave máxima de un árbol vacío
-    bst.delete_max(empty_bst)
+    bst.delete_right(empty_bst)
 
     assert empty_bst["root"] is None
 
     # Eliminar la llave máxima de un árbol con 3 nodos
-    bst.delete_max(three_bst)
+    bst.delete_right(three_bst)
 
     assert three_bst["root"]["size"] == 2
     assert three_bst["root"]["left"]["key"] == 1
@@ -384,7 +389,7 @@ def test_delete_max():
     assert three_bst["root"]["right"] is None
 
     # Eliminar la llave máxima de un árbol con 7 nodos
-    bst.delete_max(seven_bst)
+    bst.delete_right(seven_bst)
 
     assert seven_bst["root"]["size"] == 6
     assert seven_bst["root"]["right"]["right"] is None
@@ -394,7 +399,7 @@ def test_delete_max():
     assert seven_bst["root"]["right"]["left"]["key"] == 50
 
 
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_floor():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
@@ -419,7 +424,7 @@ def test_floor():
     assert bst.floor(seven_bst, 75) == 70
 
 
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_ceiling():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
@@ -444,7 +449,7 @@ def test_ceiling():
     assert bst.ceiling(seven_bst, 75) is None
 
 
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_select():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
@@ -452,12 +457,13 @@ def test_select():
 
     # Seleccionar de un árbol vacío
     assert bst.select(empty_bst, 1) is None
-
+    print ('test 1 pass')
+    
     # Seleccionar de un árbol con 3 nodos
     assert bst.select(three_bst, 1) == 5
     assert bst.select(three_bst, 2) == 10
     assert bst.select(three_bst, 3) == None
-
+    print ('test 2 pass')
     # Seleccionar de un árbol con 7 nodos
     assert bst.select(seven_bst, 1) == 20
     assert bst.select(seven_bst, 2) == 30
@@ -466,9 +472,9 @@ def test_select():
     assert bst.select(seven_bst, 5) == 60
     assert bst.select(seven_bst, 6) == 70
     assert bst.select(seven_bst, 7) == None
+    print ('test 3 pass')
 
-
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_rank():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
@@ -496,7 +502,7 @@ def test_rank():
     assert bst.rank(seven_bst, 75) == 7
 
 
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_height():
     empty_bst = setup_tests()
     one_bst = setup_one_node()
@@ -521,7 +527,7 @@ def test_height():
     assert bst.height(unbalanced_bst) == 5
 
 
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_keys():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
@@ -554,7 +560,7 @@ def test_keys():
     assert keys["elements"][6] == 70
 
 
-@handle_not_implemented
+#@pytest.mark.skip(reason="No implementado aun")
 def test_values():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
