@@ -28,14 +28,12 @@ import os
 import csv
 import datetime
 
-# TODO Realice la importación del Árbol Binario Ordenado
-# TODO Realice la importación de ArrayList (al) como estructura de datos auxiliar para sus requerimientos
-# TODO Realice la importación de LinearProbing (lp) como estructura de datos auxiliar para sus requerimientos
-
+from DataStructures.Tree import binary_search_tree as bst
+from DataStructures.List import array_list as al
+from DataStructures.List import single_linked_list as sll
+from DataStructures.Map import map_linear_probing as lp
 
 data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/'
-
-
 
 def new_logic():
     """ Inicializa el analizador
@@ -51,8 +49,7 @@ def new_logic():
                 }
 
     analyzer['crimes'] = al.new_list()
-    # TODO completar la creación del mapa ordenado
-    analyzer['dateIndex'] = None
+    analyzer['dateIndex'] = bst.new_map()
     
     return analyzer
 
@@ -96,10 +93,15 @@ def update_date_index(map, crime):
     crimedate = datetime.datetime.strptime(occurreddate, '%Y-%m-%d %H:%M:%S')
     entry = bst.get(map, crimedate.date())
     if entry is None:
-        # TODO Realizar el caso en el que no se encuentra la fecha
-        pass
+        datentry = {'lstcrimes': None,
+                    'offenseIndex': None}
+        
+        datentry['lstcrimes'] = al.new_list()
+        datentry['offenseIndex'] = lp.new_map(20, 0.7)
+        bst.put(map, crimedate.date(), datentry)
     else:
         datentry = entry
+    
     add_date_index(datentry, crime)
     return map
 
